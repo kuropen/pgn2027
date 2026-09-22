@@ -1,6 +1,9 @@
 ---
 layout: ../../layouts/Markdown.astro
 title: MICROPEN
+backTo:
+    url: /
+    title: トップページ
 ---
 # MICROPEN
 ![MICROPEN icon](./micropen.png)

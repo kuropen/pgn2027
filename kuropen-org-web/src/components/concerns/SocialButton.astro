@@ -1,0 +1,18 @@
+---
+import type { AstroSlotAttributes } from 'astro';
+
+type Props = {
+    href: string;
+    icon: AstroSlotAttributes;
+    rel?: string;
+}
+
+const { href, icon, rel } = Astro.props
+---
+
+<div class="m-1">
+    <a href={href} rel={rel} target="_blank" class="p-2 border border-gray-500 rounded-xl flex gap-2 hover:bg-blue-600 hover:text-gray-100">
+        <div role="presentation" class="social-icon-space">{icon}</div>
+        <div><slot /></div>
+    </a>
+</div>

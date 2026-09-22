@@ -1,0 +1,32 @@
+---
+import Layout from "./Layout.astro";
+import LeftArrow from "../assets/icons/left.svg";
+
+type Props = {
+    frontmatter: {
+        title?: string;
+        backTo?: {
+            url: string;
+            title?: string;
+        }
+    }
+}
+
+const {frontmatter} = Astro.props;
+
+---
+<Layout title={frontmatter.title}>
+	<section class="my-8 p-4 border border-gray-500 rounded-xl">
+        <div class="prose dark:prose-invert">
+            <slot />
+        </div>
+    </section>
+    {frontmatter.backTo ? (
+        <nav class="my-8 p-4">
+            <a href={frontmatter.backTo.url} target="_blank" class="p-2 border border-gray-500 rounded-xl flex gap-2 hover:bg-blue-600 hover:text-gray-100">
+                <div role="presentation"><LeftArrow /></div>
+                <div>{frontmatter.backTo.title ?? '前のページ'}へ戻る</div>
+            </a>
+        </nav>
+    ) : null}
+</Layout>

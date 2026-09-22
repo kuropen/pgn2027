@@ -1,0 +1,12 @@
+---
+import { Image } from 'astro:assets';
+import PenguinoneLogo from '../assets/pgn_logo.jpg';
+---
+<header class="my-8">
+    <div class="my-2 border border-gray-500 rounded-xl flex gap-2 bg-gray-900 text-gray-50">
+        <a class="flex gap-1 justify-center items-center p-1" href="/">
+            <Image src={PenguinoneLogo} class="w-12 h-12 rounded-full" alt="" aria-hidden="true" />
+            <span class="block text-xl font-bold">Penguinone</span>
+        </a>
+    </div>
+</header>

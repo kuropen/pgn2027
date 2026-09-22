@@ -1,0 +1,34 @@
+---
+import { Image } from 'astro:assets';
+import SocialButton from './SocialButton.astro';
+import PenguinAvatar from '../../assets/penguin.png';
+import LocationIcon from '../../assets/icons/location.svg';
+import GitHubIcon from '../../assets/icons/github.svg';
+import MisskeyIcon from '../../assets/icons/misskey.svg';
+import EmailIcon from '../../assets/icons/email.svg';
+---
+
+<section class="my-8 p-4 border border-gray-500 rounded-xl flex gap-4">
+    <div role="presentation">
+        <Image src={PenguinAvatar} class="w-20 h-20 rounded-full" alt="" />
+    </div>
+    <div class="grow">
+        <h1 class="sr-only">サイト運営者紹介</h1>
+        <dl>
+            <dt class="sr-only">ハンドルネーム</dt>
+            <dd class="text-3xl mb-1">Kuropen</dd>
+            <dt class="sr-only">簡単な自己紹介</dt>
+            <dd class="text-md my-1">オフラインもオンラインも充実させたいエンジニア</dd>
+            <dt class="float-left"><LocationIcon role="presentation" /><span class="sr-only">活動拠点</span></dt>
+            <dd>さいたま市 ⇔ 会津若松市</dd>
+        </dl>
+        <nav class="my-2">
+            <h2 class="sr-only">連絡先・SNS一覧</h2>
+            <ul class="grid grid-cols-1 md:grid-cols-3">
+                <li><SocialButton href="https://mi.kuropen.org/@kuropen" rel="me" icon={<MisskeyIcon />}>Misskey</SocialButton></li>
+                <li><SocialButton href="https://github.com/kuropen" icon={<GitHubIcon />}>GitHub</SocialButton></li>
+                <li><SocialButton href="https://inquiry.kuropen.org/" icon={<EmailIcon />}>メールフォーム</SocialButton></li>
+            </ul>
+        </nav>
+    </div>
+</section>

@@ -1,0 +1,26 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import RightArrow from '../../assets/icons/right.svg';
+---
+<Layout title="Eternie Labs. プロジェクトページの閉鎖について">
+    <section class="my-8 p-4 border bg-amber-300 text-black border-gray-500 rounded-xl">
+        <h1 class="text-3xl mb-8 flex gap-4 items-center">Eternie Labs. プロジェクトページの閉鎖について</h1>
+        <p>
+            <strong>Eternie Labs. プロジェクトページは、2026年9月24日に閉鎖いたしました。</strong><br />
+            Eternie Labs. プロジェクトに属していたサイトは、引き続きKuropen個人のプロジェクトとして運営しております。<a href="/">トップページ</a>からご覧ください。
+        </p>
+    </section>
+    <section class="my-8 p-4 border border-gray-500 rounded-xl flex flex-col gap-4">
+        <h1 class="text-2xl">eternie-labs.net ドメインに関するお知らせ</h1>
+        <nav>
+            <ul class="flex flex-col gap-2">
+                <li>
+                    <a href="/elnet/mail/" class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
+                        <p class="grow">メールサーバーについてのお知らせ</p>
+                        <RightArrow role="presentation" />
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </section>
+</Layout>

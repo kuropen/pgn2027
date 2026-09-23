@@ -7,7 +7,7 @@ backTo:
 ---
 # MICROPEN
 ![MICROPEN icon](./micropen.png)
-このページはKuropenの自営Misskeyサーバー・MICROPENの紹介です。2022年12月30日に開設しました。
+このページはKuropenの自営Misskeyサーバー・[MICROPEN](https://mi.kuropen.org/)の紹介です。2022年12月30日に開設しました。
 
 ## 目的
 元々はNERV防災アプリなどで知られるゲヒルン石森社長がFediverseの利用法として提唱する[ドメインでアイデンティティを確立する](https://web.archive.org/web/20230127050725/https://isid.ai/diary/2017/04/14/1179/)という思想に基づき、

@@ -16,7 +16,7 @@ jobs:
       with:
         node-version: 24
     - name: Intalling dependencies
-      run: cd ${{ github.workspace }}/kuropen-org-web && npm ci
+      run: cd ${{ github.workspace }}/kuropen-org-web && npm install
     - name: Build and Deploy to Cloudflare Workers (Production)
       run: cd ${{ github.workspace }}/kuropen-org-web && npm run deploy
       env:

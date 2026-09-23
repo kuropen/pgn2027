@@ -36,7 +36,7 @@
                 <form method="post" action="{{ route('inquiry.reset') }}" class="reset">@csrf<button class="text-button" type="submit">メールアドレスの変更・コードの再発行</button><p class="hint">入力中の本文は消去されます。再発行後は古いコードを使用できません。</p></form>
             @endif
         </section>
-        <p class="privacy">メールアドレスとお問い合わせ内容は、対応および確認メールの送信に使用します。</p>
+        <p class="privacy">ご利用の前に<a href="https://kuropen.org/privacy" target="_blank">プライバシーポリシー</a>をご確認ください。</p>
     @endif
     <footer>Kuropen.org</footer>
 </main>

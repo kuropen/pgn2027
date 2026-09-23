@@ -24,6 +24,10 @@ export default defineConfig({
       status: 301,
       destination: "https://inquiry.kuropen.org/"
     },
+    "/legal": {
+      status: 301,
+      destination: "/privacy"
+    },
   },
 
   adapter: cloudflare()

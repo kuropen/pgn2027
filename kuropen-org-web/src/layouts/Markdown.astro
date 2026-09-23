@@ -23,7 +23,7 @@ const {frontmatter} = Astro.props;
     </section>
     {frontmatter.backTo ? (
         <nav class="my-8 py-4">
-            <a href={frontmatter.backTo.url} target="_blank" class="p-2 border border-gray-500 rounded-xl flex gap-2 hover:bg-blue-600 hover:text-gray-100">
+            <a href={frontmatter.backTo.url} class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
                 <div role="presentation"><LeftArrow /></div>
                 <div>{frontmatter.backTo.title ?? '前のページ'}へ戻る</div>
             </a>

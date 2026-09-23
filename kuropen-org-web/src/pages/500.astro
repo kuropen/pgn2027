@@ -1,0 +1,8 @@
+---
+import Error from "../components/concerns/Error.astro";
+import AlertIcon from "../assets/icons/alert.svg";
+---
+<Error>
+    <h1 class="text-3xl mb-8 flex gap-4 items-center"><AlertIcon role="presentation" /> 500 Internal Server Error</h1>
+    <p>サーバーエラーが発生しました。このエラーが続く場合は、<a href="/contact" class="underline">お問い合わせ</a>ください。</p>
+</Error>

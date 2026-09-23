@@ -1,0 +1,16 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import LeftArrow from "../../assets/icons/left.svg";
+---
+
+<Layout title="エラー">
+	<section class="my-8 p-4 border bg-amber-300 text-black border-gray-500 rounded-xl">
+        <slot />
+    </section>
+    <nav class="my-8 py-4">
+        <a href="/" class="p-2 border border-gray-500 rounded-xl flex items-center gap-2 hover:bg-blue-600 hover:text-gray-100">
+            <div role="presentation"><LeftArrow /></div>
+            <div>トップページへ戻る</div>
+        </a>
+    </nav>
+</Layout>

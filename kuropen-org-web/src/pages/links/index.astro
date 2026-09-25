@@ -37,7 +37,7 @@ const links = await getCollection('links');
             バナーは以下のものをご利用ください。
         </p>
         <p>
-            <Banners client:only />
+            <Banners site={import.meta.env.SITE} client:only />
         </p>
         <p>
             リンクされた方は<a href="/contact/" class="underline">ご連絡</a>いただければこのページにリンクを掲載します。<br />

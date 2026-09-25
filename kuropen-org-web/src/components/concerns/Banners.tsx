@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 
 type BannerDefinition = {
-    key: string, 
-    size: string, 
-    src: string,
+    key: string;
+    size: string;
+    src: string;
 }
 type BannersDefinition = BannerDefinition[]
 type BannersJsonSchema = {banners: BannersDefinition}
+type BannersComponentProps = {
+    site: string;
+}
 
-export function Banners () {
+export function Banners (props: BannersComponentProps) {
     const [banners, setBanners] = useState<BannersDefinition>([]);
     const [currentBanner, setCurrentBanner] = useState<BannerDefinition | undefined>(undefined);
 
@@ -42,8 +45,8 @@ export function Banners () {
                 currentBanner ? (
                     <div className="flex flex-col gap-4">
                         <p><img className="border-2" src={currentBanner.src} alt={`バナー (${currentBanner.size})`} /></p>
-                        <p>
-                            バナーはダウンロードおよび必要に応じてリサイズしてのご利用をお願いします。
+                        <p className="text-sm">
+                            バナーURL: {`${props.site}/links/banners/${currentBanner.key}`}
                         </p>
                     </div>
                 ) : null

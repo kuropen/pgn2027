@@ -1,0 +1,47 @@
+---
+import { getCollection } from "astro:content";
+import { Image } from 'astro:assets';
+
+import Layout from "../../layouts/Layout.astro";
+import OpenInWindow from '../../assets/icons/open-in-window.svg';
+import { Banners } from "../../components/concerns/Banners";
+
+const links = await getCollection('links');
+---
+<Layout title="リンク集">
+    <section class="my-8 p-4 border border-gray-500 rounded-xl">
+        <h1 class="text-2xl mb-8">リンク集</h1>
+        <p class="my-8">主にFediverseでの相互フォロワーやご連絡いただいた方の個人サイトを中心にリンクしています。</p>
+        <nav>
+            <ul class="flex flex-col gap-2">
+                {links.map(link => (
+                    <li>
+                        <a href={link.data.url} target="_blank" rel="noopener" class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
+                            <p class="grow">
+                                {link.data.banner ? <Image src={link.data.banner} alt={link.data.name} /> : <span>{link.data.name}</span>}
+                            </p>
+                            <OpenInWindow role="presentation" />
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+    </section>
+    <section class="my-8 p-4 border border-gray-500 rounded-xl flex flex-col gap-4">
+        <h1 class="text-2xl">当サイトへのリンクについて</h1>
+        <p>
+            当サイトはリンクフリーです。
+            ただし、トップページ以外へのリンクは構成が変わってデッドリンクになる可能性がございますので、慎重にお願いいたします。
+        </p>
+        <p>
+            バナーは以下のものをご利用ください。
+        </p>
+        <p>
+            <Banners client:only />
+        </p>
+        <p>
+            リンクされた方は<a href="/contact/" class="underline">ご連絡</a>いただければこのページにリンクを掲載します。<br />
+            <small>（ページの内容によってはお断りする場合もございます。悪しからずご了承ください）</small>
+        </p>
+    </section>
+</Layout>

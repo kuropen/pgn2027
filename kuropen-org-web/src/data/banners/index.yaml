@@ -1,0 +1,6 @@
+- id: "200x40"
+  sizeText: "200×40"
+  image: ./banner_200x40.png
+- id: "234x60"
+  sizeText: "234×60"
+  image: ./banner_234x60.png

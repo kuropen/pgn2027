@@ -1,0 +1,13 @@
+---
+import { getEntry } from "astro:content";
+
+export const prerender = false;
+
+const { key } = Astro.params;
+
+const banner = key ? await getEntry('banners', key) : null
+if (!banner) {
+    return Astro.rewrite('/404');
+}
+return Astro.redirect(banner.data.image.src);
+---

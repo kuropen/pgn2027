@@ -5,8 +5,12 @@ import tailwindcss from '@tailwindcss/vite';
 
 import cloudflare from "@astrojs/cloudflare";
 
+import react from "@astrojs/react";
+
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://kuropen.org',
+
   vite: {
     plugins: [tailwindcss()]
   },
@@ -30,5 +34,6 @@ export default defineConfig({
     },
   },
 
-  adapter: cloudflare()
+  adapter: cloudflare(),
+  integrations: [react()]
 });

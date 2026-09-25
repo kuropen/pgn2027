@@ -3,10 +3,18 @@ import Layout from '../layouts/Layout.astro';
 import Author from '../components/concerns/Author.astro';
 import BlogList from '../components/concerns/BlogList.astro';
 import ProjectList from '../components/concerns/ProjectList.astro';
+
+import RightArrow from '../assets/icons/right.svg';
 ---
 
 <Layout title="Home">
 	<Author />
 	<BlogList />
 	<ProjectList />
+	<section class="my-8 p-4 border border-gray-500 rounded-xl flex flex-col gap-4">
+		<a href="/links/" class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
+			<p class="grow">リンク集・リンクについて</p>
+			<RightArrow role="presentation" />
+		</a>
+	</section>
 </Layout>

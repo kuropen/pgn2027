@@ -41,7 +41,7 @@
         </section>
         <p class="privacy">ご利用の前に<a href="https://kuropen.org/privacy" target="_blank">プライバシーポリシー</a>をご確認ください。</p>
     @endif
-    <footer>Kuropen.org</footer>
+    <footer style="text-align:center;"><a href="https://kuropen.org/"><img src="https://kuropen.org/links/banners/200x40" alt="Penguinone by Kuropen"></a></footer>
 </main>
 </body>
 </html>

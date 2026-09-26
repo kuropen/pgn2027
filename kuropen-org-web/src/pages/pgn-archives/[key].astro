@@ -1,0 +1,8 @@
+---
+export const prerender = false;
+
+const OLD_SYSTEM_URL = 'https://kuropen-org-2025-web-production.up.railway.app' as const;
+
+const { key } = Astro.params;
+return Astro.redirect(`${OLD_SYSTEM_URL}/pgn-archives/${key}`, 303);
+---

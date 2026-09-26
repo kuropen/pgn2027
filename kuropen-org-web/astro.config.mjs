@@ -32,6 +32,14 @@ export default defineConfig({
       status: 301,
       destination: "/privacy"
     },
+    "/pgn-archives": {
+      status: 303,
+      destination: "/",
+    },
+    "/pgn-archives/[...slug]": {
+      status: 303,
+      destination: "https://kuropen-org-2025-web-production.up.railway.app/pgn-archives/[...slug]"
+    },
   },
 
   adapter: cloudflare(),

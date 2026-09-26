@@ -1,7 +1,17 @@
 ---
+import type { GetStaticPaths } from "astro";
 import { getCollection } from "astro:content";
 
-export const prerender = false;
+export const getStaticPaths = (async () => {
+    const redirctedArchiveCollection = await getCollection('redirctedArchives');
+    return redirctedArchiveCollection.map((archive) => (
+        {
+            params: {
+                key: archive.data.old_path,
+            },
+        }
+    ));
+}) satisfies GetStaticPaths;
 
 const redirctedArchiveCollection = await getCollection('redirctedArchives');
 

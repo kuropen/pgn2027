@@ -19,7 +19,19 @@ const banners = defineCollection({
     }),
 })
 
+const redirctedArchives = defineCollection({
+    loader: file("src/data/redirected_archives.json"),
+    schema: z.object({
+        title: z.string(),
+        old_path: z.string(),
+        new_url: z.url(),
+        created_at: z.string(), // 日付として処理しない
+        updated_at: z.string(), // 日付として処理しない
+    }),
+})
+
 export const collections = {
     links,
     banners,
+    redirctedArchives,
 }

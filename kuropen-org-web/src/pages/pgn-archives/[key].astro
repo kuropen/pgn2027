@@ -1,8 +1,12 @@
 ---
+import { getCollection } from "astro:content";
+
 export const prerender = false;
 
-const OLD_SYSTEM_URL = 'https://kuropen-org-2025-web-production.up.railway.app' as const;
+const redirctedArchiveCollection = await getCollection('redirctedArchives');
 
 const { key } = Astro.params;
-return Astro.redirect(`${OLD_SYSTEM_URL}/pgn-archives/${key}`, 303);
+
+const referencedArchive = redirctedArchiveCollection.find((archive) => archive.data.old_path === key)
+return Astro.redirect(referencedArchive?.data.new_url || '/404', 303);
 ---

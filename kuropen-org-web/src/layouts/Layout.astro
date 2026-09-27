@@ -1,15 +1,30 @@
 ---
+import type { BreadcrumbsElement } from '../types';
 import '../styles/global.css';
 import { Font } from "astro:assets";
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 type Props = {
 	title?: string;
+	breadcrumbs?: BreadcrumbsElement[];
+	isHome?: boolean;
 }
 
 const pageTitle = Astro.props.title;
 const shownTitle = (pageTitle ? `${pageTitle} - ` : '') + 'Penguinone';
+
+const breadcrumbs: BreadcrumbsElement[] = [
+	{
+		title: 'ホーム',
+		url: '/',
+	}
+]
+if (!Astro.props.isHome) {
+	Astro.props.breadcrumbs?.filter((element) => element.title !== 'トップページ').forEach((element) => breadcrumbs.push(element))
+	breadcrumbs.push({title: pageTitle || '現在のページ'})
+}
 ---
 
 <!doctype html>
@@ -31,6 +46,7 @@ const shownTitle = (pageTitle ? `${pageTitle} - ` : '') + 'Penguinone';
 		<div id="headAccent" role="presentation"></div>
 		<div class="my-2 mx-auto max-w-3xl px-4">
 			<Header />
+			{Astro.props.isHome ? null : <Breadcrumbs breadcrumbs={breadcrumbs} />}
 			<main>
 				<slot />
 			</main>

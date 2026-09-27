@@ -4,3 +4,9 @@
 - id: "234x60"
   sizeText: "234×60"
   image: ./banner_234x60.png
+- id: "468x120"
+  sizeText: "468×120"
+  image: ./banner_468x120.png
+- id: "600x120"
+  sizeText: "600×120"
+  image: ./banner_600x120.png

@@ -1,0 +1,28 @@
+---
+import type { BreadcrumbsElement } from '../types';
+
+type Props = {
+    breadcrumbs: BreadcrumbsElement[];
+}
+
+const { breadcrumbs } = Astro.props
+---
+<nav class="my-8 p-2 border border-gray-500 rounded-xl">
+    <div class="sr-only">ページ階層: </div>
+    <ul class="flex">
+        {breadcrumbs.map((element) => {
+            return (
+                <li>
+                    {element.url ? (<a href={element.url} class="underline">{element.title}</a>) : element.title}
+                </li>
+            )
+        })}
+    </ul>
+</nav>
+<style>
+    nav ul li:not(:last-child)::after {
+        margin-left: 1ex;
+        margin-right: 1ex;
+        content: ">";
+    }
+</style>

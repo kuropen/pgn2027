@@ -1,7 +1,15 @@
-- id: renem2185
+- id: 1
   name: "Murakumo-san is distributed now"
-  url: https://renem2185.github.io/
-- id: t2arc
+  url: "https://renem2185.github.io/"
+- id: 2
   name: "@ozoramoreのブログ"
-  url: https://t2arc.net/
+  url: "https://t2arc.net/"
   banner: ./t2arc.png
+- id: 3
+  name: "OopsOkinTP"
+  url: https://www.okin-jp.net/
+  banner: ./okin.png
+- id: 4
+  name: "**** （よつぼし）"
+  url: https://tomadoi.com/
+  banner: ./tomadoi.png

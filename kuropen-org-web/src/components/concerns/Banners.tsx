@@ -14,6 +14,7 @@ type BannersComponentProps = {
 export function Banners (props: BannersComponentProps) {
     const [banners, setBanners] = useState<BannersDefinition>([]);
     const [currentBanner, setCurrentBanner] = useState<BannerDefinition | undefined>(undefined);
+    const isMobile = navigator.userAgentData?.mobile || navigator.userAgent.toLowerCase().includes('mobile');
 
     useEffect(() => {
         fetch('/links/banners/list.json', {method: 'GET'})
@@ -25,7 +26,13 @@ export function Banners (props: BannersComponentProps) {
         <form className="flex flex-col gap-4">
             <div className="flex gap-4">
                 <div className="font-bold">サイズ</div>
-                {banners.map(banner => (
+                { isMobile ? (
+                    <select onChange={e => setCurrentBanner(banners.find(el => el.key === e.currentTarget.value))}>
+                        {banners.map(banner => (
+                            <option value={banner.key} selected={banner.key === currentBanner?.key}>{banner.size}</option>
+                        ))}
+                    </select>
+                ) : banners.map(banner => (
                     <div key={banner.key}>
                         <input 
                             type="radio" 
@@ -33,13 +40,13 @@ export function Banners (props: BannersComponentProps) {
                             name="sizeSelect" 
                             id={`sizeSelect_${banner.key}`} 
                             value={banner.key} 
+                            checked={banner.key === currentBanner?.key}
                             onChange={e => setCurrentBanner(banners.find(el => el.key === e.currentTarget.value))}
                         />
                         <label htmlFor={`sizeSelect_${banner.key}`}>
                             {banner.size}
                         </label>
-                    </div>
-                ))}
+                    </div>))}
             </div>
             {
                 currentBanner ? (

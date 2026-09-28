@@ -7,22 +7,29 @@ interface NavigatorUAData {
   readonly brands: Brand[];
   readonly mobile: boolean;
   readonly platform: string;
-  getHighEntropyValues(hints: string[]): Promise<NavigatorUADataWithHighEntropy>;
+  getHighEntropyValues<K extends Hints>(hints: K[]): Promise<NavigatorUADataWithHighEntropy<typeof hints[number]>>;
+  toJSON(): string;
 };
 
-type NavigatorUADataWithHighEntropy = {
-  readonly brands: Brand[];
-  readonly mobile: boolean;
-  readonly platform: string;
-  readonly architecture?: string;
-  readonly bitness?: string;
-  readonly formFactor?: string;
-  readonly fullVersionList?: Brand[]
-  readonly model?: string;
-  readonly platformVersion?: string;
-  readonly wow64?: string;
-};
+type HighEntropyUAData = {
+  readonly architecture: string;
+  readonly bitness: string;
+  readonly formFactor: string;
+  readonly fullVersionList: Brand[]
+  readonly model: string;
+  readonly platformVersion: string;
+  readonly wow64: boolean;
+}
+type Hints = keyof HighEntropyUAData;
+
+type NavigatorUADataWithHighEntropy<K extends Hints> = 
+  Omit<NavigatorUAData, "getHighEntropyValues" | "toJSON"> & Pick<HighEntropyUAData, K>;
 
 interface Navigator {
-  userAgentData: NavigatorUAData;
+  /**
+   * User-Agent Client Hints.
+   * NOTE: Only available in Chromium-based browsers. This will be `undefined` in WebKit and Mozilla.
+   * @see https://wicg.github.io/ua-client-hints/
+   */
+  readonly userAgentData?: NavigatorUAData;
 }

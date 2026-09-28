@@ -9,7 +9,7 @@ const { breadcrumbs } = Astro.props
 ---
 <nav class="my-8 p-2 border border-gray-500 rounded-xl">
     <div class="sr-only">ページ階層: </div>
-    <ul class="flex">
+    <ul class="flex flex-col md:flex-row gap-2 md:gap-0">
         {breadcrumbs.map((element) => {
             return (
                 <li>

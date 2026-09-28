@@ -21,15 +21,25 @@ export function Banners (props: BannersComponentProps) {
         .then(res => res.json() as Promise<BannersJsonSchema>)
         .then(data => setBanners(data.banners))
     }, []);
+
+    useEffect(() => {
+        if (isMobile && !currentBanner && banners.length > 0) {
+            setCurrentBanner(banners[0])
+        }
+    }, [banners, currentBanner, isMobile])
     
     return (
         <form className="flex flex-col gap-4">
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
                 <div className="font-bold">サイズ</div>
                 { isMobile ? (
-                    <select onChange={e => setCurrentBanner(banners.find(el => el.key === e.currentTarget.value))}>
+                    <select 
+                        className="border rounded-lg p-1" 
+                        onChange={e => setCurrentBanner(banners.find(el => el.key === e.currentTarget.value))}
+                        value={currentBanner?.key}
+                    >
                         {banners.map(banner => (
-                            <option value={banner.key} selected={banner.key === currentBanner?.key}>{banner.size}</option>
+                            <option key={banner.key} value={banner.key}>{banner.size}</option>
                         ))}
                     </select>
                 ) : banners.map(banner => (

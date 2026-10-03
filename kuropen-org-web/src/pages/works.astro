@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProjectList from '../components/concerns/ProjectList.astro';
+
+import LeftArrow from "../assets/icons/left.svg";
+---
+
+<Layout title="プロジェクト">
+    <section class="my-8 p-4 border border-gray-500 rounded-xl flex flex-col gap-4">
+		こちらには個人として開発・運用するプロジェクトを記載しています。（業務で開発したものは含まれません。）
+	</section>
+	<ProjectList />
+	<section class="my-8 p-4 border border-gray-500 rounded-xl flex flex-col gap-4">
+		<a href="/" class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
+            <LeftArrow role="presentation" />
+			<p class="grow">トップページへ</p>
+		</a>
+	</section>
+</Layout>

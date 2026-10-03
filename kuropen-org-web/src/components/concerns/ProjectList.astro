@@ -1,23 +1,31 @@
 ---
+import { getCollection } from 'astro:content';
 import RightArrow from '../../assets/icons/right.svg';
+import OpenInWindow from '../../assets/icons/open-in-window.svg';
+
+type Props = {
+    limit?: number
+}
+
+const projectCollection = await getCollection('projects')
 ---
 
 <section class="my-8 p-4 border border-gray-500 rounded-xl flex flex-col gap-4">
     <h1 class="text-2xl">プロジェクト一覧</h1>
     <nav>
         <ul class="flex flex-col gap-2">
-             <li>
-                <a href="/micropen" class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
-                    <p class="grow">MICROPEN</p>
-                    <RightArrow role="presentation" />
-                </a>
-             </li>
-             <li>
-                <a href="/works" class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
-                    <p class="grow">小規模プロジェクトの紹介</p>
-                    <RightArrow role="presentation" />
-                </a>
-             </li>
+            {projectCollection.slice(0, Astro.props.limit).map((project) => {
+                const { url, name } = project.data
+                const isExternal = !url.startsWith(import.meta.env.SITE)
+                return (
+                    <li>
+                        <a href={url} target={isExternal ? '_blank' : '_self'} class="p-2 border border-gray-500 rounded-xl flex gap-2 items-center hover:bg-blue-600 hover:text-gray-100">
+                            <p class="grow">{name}</p>
+                            {isExternal ? <OpenInWindow role="presentation" /> : <RightArrow role="presentation" />}
+                        </a>
+                    </li>
+                )
+            })}
         </ul>
     </nav>
 </section>

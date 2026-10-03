@@ -19,6 +19,14 @@ const banners = defineCollection({
     }),
 })
 
+const projects = defineCollection({
+    loader: file("src/data/projects.yaml"),
+    schema: () => z.object({
+        name: z.string(),
+        url: z.url(),
+    }),
+})
+
 const redirctedArchives = defineCollection({
     loader: file("src/data/redirected_archives.json"),
     schema: z.object({
@@ -34,4 +42,5 @@ export const collections = {
     links,
     banners,
     redirctedArchives,
+    projects,
 }

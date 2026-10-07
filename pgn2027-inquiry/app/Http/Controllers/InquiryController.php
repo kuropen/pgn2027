@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Mail\InquiryMail;
 use App\Mail\QueueInquiryMail;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -24,6 +27,8 @@ class InquiryController extends Controller
 
     public function code(Request $request): RedirectResponse
     {
+        $this->verifyTurnstile($request, 'inquiry_code');
+
         $data = $request->validate(['email' => ['required', 'string', 'email:rfc', 'max:254']], [
             'email.required' => '返信先のメールアドレスを入力してください。',
             'email.email' => '有効なメールアドレスを入力してください。',
@@ -60,6 +65,8 @@ class InquiryController extends Controller
 
     public function submit(Request $request): RedirectResponse
     {
+        $this->verifyTurnstile($request, 'inquiry_submit');
+
         $data = $request->validate([
             'code' => ['required', 'regex:/\A[0-9]{6}\z/'],
             'category' => ['required', Rule::in(array_keys(config('inquiry.categories')))],
@@ -107,5 +114,36 @@ class InquiryController extends Controller
         DB::table('inquiry_challenges')->where('id', $request->session()->pull('challenge_id'))->delete();
 
         return redirect()->route('inquiry');
+    }
+
+    private function verifyTurnstile(Request $request, string $expectedAction): void
+    {
+        $token = $request->input('cf-turnstile-response');
+        $secret = config('services.turnstile.secret');
+        $hostnames = config('services.turnstile.hostnames', []);
+        if (app()->environment('production')) {
+            $hostnames = array_diff($hostnames, ['localhost', '127.0.0.1']);
+        }
+        $message = 'セキュリティ確認に失敗しました。フォームを開き直して、再度お試しください。';
+
+        abort_unless(is_string($token) && strlen($token) > 0 && strlen($token) <= 2048
+            && is_string($secret) && trim($secret) !== '' && $hostnames !== [], 403, $message);
+
+        try {
+            $response = Http::asForm()->connectTimeout(5)->timeout(10)->post(
+                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                ['secret' => $secret, 'response' => $token, 'remoteip' => $request->ip()],
+            );
+        } catch (ConnectionException) {
+            abort(403, $message);
+        }
+
+        $result = $response->json();
+        abort_unless($response->successful() && is_array($result)
+            && ($result['success'] ?? null) === true
+            && ($result['action'] ?? null) === $expectedAction
+            && in_array($result['hostname'] ?? null, $hostnames, true), 403, $message);
+
+        abort_unless(Cache::add('turnstile-used:'.hash('sha256', $token), true, 300), 403, $message);
     }
 }

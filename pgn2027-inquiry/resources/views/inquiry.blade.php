@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="{{ asset('favicon-32x32.png') }}" sizes="32x32">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="stylesheet" href="{{ asset('inquiry.css') }}">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
 <main>
@@ -26,6 +27,7 @@
                     <label for="email">返信先メールアドレス <span class="required">必須</span></label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" autocomplete="email" placeholder="you@example.com" maxlength="254" required aria-describedby="email-help">
                     <p id="email-help" class="hint">受信できるメールアドレスを入力してください。</p>
+                    <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.sitekey') }}" data-action="inquiry_code" data-size="flexible" data-language="ja"></div>
                     <button type="submit">確認コードを送信 <span aria-hidden="true">→</span></button>
                 </form>
             @else
@@ -34,9 +36,12 @@
                     <label for="code">確認コード <span class="required">必須</span></label><input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="123456" required>
                     <label for="category">問い合わせ種別 <span class="required">必須</span></label><select id="category" name="category" required><option value="">選択してください</option>@foreach($categories as $key => $category)<option value="{{ $key }}" @selected(old('category') === $key)>{{ $category['label'] }}</option>@endforeach</select>
                     <label for="body">お問い合わせ本文 <span class="required">必須</span></label><textarea id="body" name="body" rows="8" maxlength="10000" required aria-describedby="body-help">{{ old('body') }}</textarea><p id="body-help" class="hint">10,000文字以内。パスワードなどの機密情報は入力しないでください。</p>
+                    <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.sitekey') }}" data-action="inquiry_submit" data-size="flexible" data-language="ja"></div>
                     <button type="submit">お問い合わせを送信 <span aria-hidden="true">→</span></button>
                 </form>
-                <form method="post" action="{{ route('inquiry.reset') }}" class="reset">@csrf<button class="text-button" type="submit">メールアドレスの変更・コードの再発行</button><p class="hint">入力中の本文は消去されます。再発行後は古いコードを使用できません。</p></form>
+                <form method="post" action="{{ route('inquiry.reset') }}" class="reset">@csrf
+                    <button class="text-button" type="submit">メールアドレスの変更・コードの再発行</button><p class="hint">入力中の本文は消去されます。再発行後は古いコードを使用できません。</p>
+                </form>
             @endif
         </section>
         <p class="privacy">ご利用の前に<a href="https://kuropen.org/privacy" target="_blank">プライバシーポリシー</a>をご確認ください。</p>

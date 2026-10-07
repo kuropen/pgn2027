@@ -107,6 +107,7 @@ class InquiryOutboxTest extends TestCase
 
     public function test_verified_inquiry_records_both_deliveries_atomically(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         Queue::fake();
         DB::table('inquiry_challenges')->insert([
             'id' => 'challenge', 'email' => 'visitor@example.com',
@@ -114,7 +115,7 @@ class InquiryOutboxTest extends TestCase
             'expires_at' => now()->addMinutes(10), 'attempts' => 0,
         ]);
         $this->withSession(['challenge_id' => 'challenge'])->post('/inquiry', [
-            'code' => '123456', 'category' => 'other', 'body' => 'Test inquiry',
+            'cf-turnstile-response' => 'test-token', 'code' => '123456', 'category' => 'other', 'body' => 'Test inquiry',
         ])->assertSessionHas('complete');
         $this->assertDatabaseCount('inquiry_outbox', 2);
         $this->assertDatabaseCount('inquiry_challenges', 0);

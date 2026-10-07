@@ -14,6 +14,12 @@ return [
     |
     */
 
+    'turnstile' => [
+        'sitekey' => env('TURNSTILE_SITEKEY'),
+        'secret' => env('TURNSTILE_SECRET'),
+        'hostnames' => array_values(array_filter(array_map('trim', explode(',', env('TURNSTILE_HOSTNAMES', 'inquiry.kuropen.org'))))),
+    ],
+
     'mailgun' => ['domain' => env('MAILGUN_DOMAIN'), 'secret' => env('MAILGUN_SECRET'), 'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'), 'scheme' => 'https'],
 
     'postmark' => [

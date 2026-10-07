@@ -6,7 +6,9 @@ use App\Mail\InquiryMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class InquiryTest extends TestCase
@@ -21,6 +23,7 @@ class InquiryTest extends TestCase
 
     public function test_queue_failure_rolls_back_both_mails_and_keeps_code(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         $this->challenge();
         DB::unprepared("CREATE TRIGGER fail_second_job BEFORE INSERT ON jobs WHEN (SELECT COUNT(*) FROM jobs) = 1 BEGIN SELECT RAISE(ABORT, 'test queue failure'); END");
         $this->post('/inquiry', $this->payload())->assertSessionHasErrors('code');
@@ -33,6 +36,7 @@ class InquiryTest extends TestCase
 
     public function test_code_is_bound_to_issuing_session(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         Mail::fake();
         $this->challenge();
         $this->withSession(['challenge_id' => 'another-session'])->post('/inquiry', $this->payload())->assertSessionHasErrors('code');
@@ -50,7 +54,7 @@ class InquiryTest extends TestCase
 
     private function payload(array $overrides = []): array
     {
-        return array_merge(['code' => '123456', 'category' => 'fediverse', 'body' => 'テストのお問い合わせです。'], $overrides);
+        return array_merge(['cf-turnstile-response' => (string) Str::uuid(), 'code' => '123456', 'category' => 'fediverse', 'body' => 'テストのお問い合わせです。'], $overrides);
     }
 
     public function test_form_is_displayed(): void
@@ -60,8 +64,9 @@ class InquiryTest extends TestCase
 
     public function test_code_is_queued_and_only_hash_is_saved(): void
     {
+        $this->fakeTurnstile('inquiry_code');
         Mail::fake();
-        $this->post('/code', ['email' => 'visitor@example.com'])->assertRedirect('/')->assertSessionHas('challenge_id');
+        $this->post('/code', ['email' => 'visitor@example.com', 'cf-turnstile-response' => 'test-token'])->assertRedirect('/')->assertSessionHas('challenge_id');
         $row = DB::table('inquiry_challenges')->first();
         Mail::assertQueued(InquiryMail::class, function ($mail) use ($row) {
             preg_match('/確認コード: ([0-9]{6})/', $mail->messageText, $matches);
@@ -72,6 +77,7 @@ class InquiryTest extends TestCase
 
     public function test_valid_code_routes_both_categories_and_cannot_be_reused(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         foreach (['fediverse' => 'fedi-master@mi.kuropen.org', 'other' => 'webmaster@kuropen.org'] as $category => $recipient) {
             Mail::fake();
             $this->challenge();
@@ -86,6 +92,7 @@ class InquiryTest extends TestCase
 
     public function test_wrong_codes_lock_after_five_attempts(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         Mail::fake();
         $this->challenge();
         for ($i = 0; $i < 5; $i++) {
@@ -98,6 +105,7 @@ class InquiryTest extends TestCase
 
     public function test_expired_or_missing_code_cannot_send(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         Mail::fake();
         $this->post('/inquiry', $this->payload())->assertSessionHasErrors('code');
         $this->challenge(['expires_at' => now()->subSecond()]);
@@ -107,6 +115,7 @@ class InquiryTest extends TestCase
 
     public function test_invalid_category_and_empty_body_are_rejected(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         Mail::fake();
         $this->challenge();
         $this->post('/inquiry', $this->payload(['category' => 'arbitrary', 'body' => '  ']))->assertSessionHasErrors(['category', 'body']);
@@ -115,21 +124,25 @@ class InquiryTest extends TestCase
 
     public function test_reset_invalidates_previous_code(): void
     {
+        Http::preventStrayRequests();
         $this->challenge();
         $this->post('/reset')->assertRedirect('/')->assertSessionMissing('challenge_id');
         $this->assertDatabaseCount('inquiry_challenges', 0);
+        Http::assertNothingSent();
     }
 
     public function test_code_requests_are_rate_limited(): void
     {
+        $this->fakeTurnstile('inquiry_code');
         Mail::fake();
-        $this->post('/code', ['email' => 'visitor@example.com'])->assertRedirect();
-        $this->post('/code', ['email' => 'visitor@example.com'])->assertStatus(429);
+        $this->post('/code', ['email' => 'visitor@example.com', 'cf-turnstile-response' => 'test-token'])->assertRedirect();
+        $this->post('/code', ['email' => 'visitor@example.com', 'cf-turnstile-response' => 'test-token'])->assertStatus(429);
         Mail::assertQueuedCount(1);
     }
 
     public function test_database_queue_is_atomic_and_encrypted(): void
     {
+        $this->fakeTurnstile('inquiry_submit');
         config(['queue.default' => 'database']);
         $this->challenge();
         $this->post('/inquiry', $this->payload())->assertSessionHas('complete');

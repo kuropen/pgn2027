@@ -19,7 +19,7 @@ export default defineConfig({
 
   fonts: [
     {
-      provider: fontProviders.fontsource(),
+      provider: fontProviders.bunny(),
       name: "IBM Plex Sans JP",
       cssVariable: "--font-ibm-plex-sans-jp",
     }

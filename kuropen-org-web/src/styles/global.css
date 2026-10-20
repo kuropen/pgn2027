@@ -1,6 +1,9 @@
+@import url(https://fonts.bunny.net/css?family=ibm-plex-sans-jp:400,700);
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
 body {
+	font-family: 'IBM Plex Sans JP', sans-serif;
 	@apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50;
 }
 #headAccent {

@@ -1,0 +1,6 @@
+---
+export const prerender = false;
+
+const { path } = Astro.params;
+return Astro.redirect(`/pgn-archives/${path}`, 301);
+---

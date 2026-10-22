@@ -1,0 +1,163 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { env } from 'cloudflare:workers';
+import { categories, digest, validateInquiry, verifyTurnstile } from '../server/inquiry';
+
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('Referrer-Policy', 'same-origin');
+Astro.response.headers.set('X-Robots-Tag', 'noindex');
+
+const cookieName = Astro.url.protocol === 'https:' ? '__Host-inquiry' : 'inquiry';
+let session = Astro.cookies.get(cookieName)?.value;
+if (!session || !/^[a-f0-9-]{36}$/.test(session)) session = crypto.randomUUID();
+Astro.cookies.set(cookieName, session, { path: '/', httpOnly: true, secure: Astro.url.protocol === 'https:', sameSite: 'strict', maxAge: 3600 });
+const coordinator = env.INQUIRY.getByName(`session:${session}`);
+let error = '';
+let status = '';
+let complete = false;
+let email = '';
+let category = '';
+let body = '';
+
+if (Astro.request.method === 'POST') {
+    try {
+        if (Astro.request.headers.get('origin') !== Astro.url.origin) {
+            Astro.response.status = 403;
+            error = 'フォームを開き直して、再度お試しください。';
+        } else if (Number(Astro.request.headers.get('content-length') || 0) > 131072) {
+            Astro.response.status = 413;
+            error = '入力内容が長すぎます。';
+        } else {
+            // Bound streamed requests too, including requests without Content-Length.
+            const reader = Astro.request.body?.getReader();
+            const chunks: Uint8Array[] = [];
+            let size = 0;
+            if (reader) {
+                while (true) {
+                    const chunk = await reader.read();
+                    if (chunk.done) break;
+                    size += chunk.value.byteLength;
+                    if (size > 131072) { await reader.cancel(); throw new Error('body_limit'); }
+                    chunks.push(chunk.value);
+                }
+            }
+            const data = await new Response(new Blob(chunks), { headers: { 'Content-Type': Astro.request.headers.get('content-type') || '' } }).formData();
+            const field = (name: string) => typeof data.get(name) === 'string' ? String(data.get(name)) : '';
+            const action = field('action');
+            email = field('email').trim();
+            category = field('category');
+            body = field('body');
+            if (action === 'reset') {
+                await coordinator.reset();
+                return Astro.redirect('/inquiry', 303);
+            }
+            if (!['code', 'submit'].includes(action)) {
+                Astro.response.status = 400;
+                error = 'フォームを開き直して、再度お試しください。';
+            } else {
+                const ip = await digest(Astro.request.headers.get('CF-Connecting-IP') || 'local');
+                const limiter = env.INQUIRY.getByName(`ip:${ip}`);
+                const allowed = action === 'code'
+                    ? await limiter.rate('minute', 1, 60) && await limiter.rate('hour', 10, 3600)
+                    : await limiter.rate('submit', 20, 60);
+                if (!allowed) {
+                    Astro.response.status = 429;
+                    error = '送信回数の上限に達しました。しばらく待ってからお試しください。';
+                } else if (!await verifyTurnstile(Astro.request, field('cf-turnstile-response'), `inquiry_${action}`, env)) {
+                    Astro.response.status = 403;
+                    error = 'セキュリティ確認に失敗しました。フォームを開き直して、再度お試しください。';
+                } else if (action === 'code') {
+                    if (email.length > 254 || !/^[^\s<>@,;:"\\]+@[^\s<>@,;:"\\]+\.[^\s<>@,;:"\\]+$/.test(email)) {
+                        error = '有効なメールアドレスを入力してください。';
+                    } else if (!await env.INQUIRY.getByName(`email:${await digest(email.toLowerCase())}`).rate('code', 3, 3600)) {
+                        Astro.response.status = 429;
+                        error = 'このメールアドレスへの送信回数が上限に達しました。1時間ほど待ってからお試しください。';
+                    } else {
+                        error = await coordinator.issue(email) || '';
+                        if (!error) status = '確認コードを送信しました。メールをご確認ください。';
+                    }
+                } else {
+                    error = validateInquiry(field('code'), category, body) || await coordinator.submit(field('code'), category, body) || '';
+                    if (!error) {
+                        complete = true;
+                        // A new inquiry gets a separate coordinator; pending delivery remains durable.
+                        Astro.cookies.delete(cookieName, { path: '/' });
+                    }
+                }
+                if (error && Astro.response.status === 200) Astro.response.status = 422;
+            }
+        }
+    } catch {
+        Astro.response.status = 503;
+        error = '処理を完了できませんでした。しばらくしてから再度お試しください。';
+    }
+}
+const challenge = complete ? null : await coordinator.view();
+const configured = Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY);
+---
+
+<Layout title="メールフォーム" breadcrumbs={[{ title: 'Contact', url: '/contact' }]}>
+    <section class="my-8 p-4 border border-gray-500 rounded-xl flex flex-col gap-4 inquiry">
+        <h1 class="text-2xl font-bold">メールフォーム</h1>
+        <p>MICROPENに関すること、その他のご連絡はこちらから。</p>
+        {complete ? <div role="status" class="flex flex-col gap-4">
+            <h2 class="text-xl font-bold">お問い合わせを受け付けました</h2>
+            <p>ご入力いただいたメールアドレスへ確認メールをお送りします。メールが届かない場合は、迷惑メールフォルダーもご確認ください。</p>
+            <a href="/inquiry" class="underline">新しいお問い合わせ</a>
+        </div> : <>
+            <ol class="flex flex-wrap gap-4" aria-label="入力の流れ">
+                <li aria-current={!challenge ? 'step' : undefined}>01 メールアドレス</li>
+                <li aria-current={challenge ? 'step' : undefined}>02 確認・お問い合わせ</li>
+            </ol>
+            {status && <p role="status" class="p-3 border rounded-xl">{status}</p>}
+            {error && <p role="alert" class="p-3 border border-red-500 rounded-xl">{error}</p>}
+            {!configured && <p role="alert">現在フォームをご利用いただけません。しばらくしてから再度お試しください。</p>}
+            {!challenge ? <form method="post" action="/inquiry" class="flex flex-col gap-4">
+                <input type="hidden" name="action" value="code" />
+                <h2 class="text-xl font-bold">返信先を確認します</h2>
+                <p>いたずら防止のため、最初にメールアドレスを確認します。入力したアドレスに6桁の確認コードをお送りします。</p>
+                <label for="email">返信先メールアドレス（必須）</label>
+                <input id="email" name="email" type="email" autocomplete="email" maxlength="254" value={email} required />
+                {configured && <div class="cf-turnstile" data-sitekey={env.TURNSTILE_SITE_KEY} data-action="inquiry_code" data-size="flexible" data-language="ja"></div>}
+                <button type="submit" disabled={!configured}>確認コードを送信 →</button>
+            </form> : <>
+                <form method="post" action="/inquiry" class="flex flex-col gap-4">
+                    <input type="hidden" name="action" value="submit" />
+                    <h2 class="text-xl font-bold">お問い合わせ内容を入力</h2>
+                    <p><strong class="break-all">{challenge.email}</strong> 宛ての確認コードを入力してください。有効期限は発行から10分です。</p>
+                    <label for="code">確認コード（必須）</label>
+                    <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required />
+                    <label for="category">問い合わせ種別（必須）</label>
+                    <select id="category" name="category" required>
+                        <option value="">選択してください</option>
+                        {Object.entries(categories).map(([key, value]) => <option value={key} selected={category === key}>{value.label}</option>)}
+                    </select>
+                    <label for="body">お問い合わせ本文（必須）</label>
+                    <textarea id="body" name="body" rows="8" maxlength="10000" required aria-describedby="body-help">{body}</textarea>
+                    <p id="body-help" class="text-sm">10,000文字以内。パスワードなどの機密情報は入力しないでください。</p>
+                    {configured && <div class="cf-turnstile" data-sitekey={env.TURNSTILE_SITE_KEY} data-action="inquiry_submit" data-size="flexible" data-language="ja"></div>}
+                    <button type="submit" disabled={!configured}>お問い合わせを送信 →</button>
+                </form>
+                <form method="post" action="/inquiry" class="flex flex-col gap-2">
+                    <input type="hidden" name="action" value="reset" />
+                    <button type="submit">メールアドレスの変更・コードの再発行</button>
+                    <p class="text-sm">入力中の本文は消去されます。再発行後は古いコードを使用できません。</p>
+                </form>
+            </>}
+            <p>ご利用の前に<a href="/privacy" class="underline">プライバシーポリシー</a>をご確認ください。</p>
+        </>}
+    </section>
+</Layout>
+{!complete && configured && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+
+<style>
+    @reference '../styles/global.css';
+    .inquiry input:not([type="hidden"]), .inquiry select, .inquiry textarea {
+        @apply w-full min-w-0 p-3 border border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-900;
+    }
+    .inquiry button { @apply p-3 border border-gray-500 rounded-xl hover:bg-blue-600 hover:text-gray-100 cursor-pointer; }
+    .inquiry button:disabled { @apply opacity-50 cursor-not-allowed; }
+    .inquiry :is(input, select, textarea, button):focus-visible { @apply outline-2 outline-offset-2 outline-blue-500; }
+    [aria-current="step"] { @apply font-bold text-blue-700 dark:text-blue-300; }
+</style>

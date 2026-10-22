@@ -14,4 +14,4 @@ Fediverse (Mastodon, Misskey, Pleroma等) のサーバーにアカウントを�
 [システム稼働状況](https://status.kuropen.org/)をご確認ください。
 
 ### Fediverseサーバーにアカウントをお持ちでない場合
-[一般向けのメールフォーム](https://inquiry.kuropen.org/)をご利用ください。
+[一般向けのメールフォーム](/inquiry)をご利用ください。

@@ -3,12 +3,24 @@
 	"compatibility_date": "2026-09-21",
 	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "kuropen-org-web",
-	"main": "@astrojs/cloudflare/entrypoints/server",
+	"main": "./src/worker.ts",
+	"kv_namespaces": [{ "binding": "INQUIRY_CODES" }],
+	"send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["inquiry@kuropen.org"] }],
+	"durable_objects": {
+		"bindings": [{ "name": "INQUIRY", "class_name": "InquiryCoordinator" }]
+	},
+	"migrations": [{ "tag": "inquiry-v1", "new_sqlite_classes": ["InquiryCoordinator"] }],
+	"vars": {
+		"INQUIRY_FROM": "inquiry@kuropen.org",
+		"TURNSTILE_SITE_KEY": "",
+		"TURNSTILE_HOSTNAMES": "kuropen.org"
+	},
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"
 	},
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"traces": { "enabled": true }
 	}
 }

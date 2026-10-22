@@ -36,7 +36,7 @@ export default defineConfig({
     },
     "/contact/form": {
       status: 301,
-      destination: "https://inquiry.kuropen.org/"
+      destination: "/inquiry"
     },
     "/legal": {
       status: 301,

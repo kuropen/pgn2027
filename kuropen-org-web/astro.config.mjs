@@ -26,6 +26,14 @@ export default defineConfig({
   ],
 
   redirects: {
+    "/ja": {
+      status: 301,
+      destination: "/"
+    },
+    "/en": {
+      status: 301,
+      destination: "/"
+    },
     "/contact/form": {
       status: 301,
       destination: "https://inquiry.kuropen.org/"

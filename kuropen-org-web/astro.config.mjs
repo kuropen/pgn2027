@@ -26,17 +26,17 @@ export default defineConfig({
   ],
 
   redirects: {
-    "/posts/[slug]": {
+    "/posts/[...slug]": {
       status: 301,
-      destination: "/pgn-archives/[slug]"
+      destination: "/pgn-archives/[...slug]"
     },
-    "/articles/[slug]": {
+    "/articles/[...slug]": {
       status: 301,
-      destination: "/pgn-archives/[slug]"
+      destination: "/pgn-archives/[...slug]"
     },
-    "/blog/[slug]": {
+    "/blog/[...slug]": {
       status: 301,
-      destination: "/pgn-archives/[slug]"
+      destination: "/pgn-archives/[...slug]"
     },
     "/ja": {
       status: 301,
@@ -46,13 +46,13 @@ export default defineConfig({
       status: 301,
       destination: "/"
     },
-    "/ja/posts/[path]": {
+    "/ja/posts/[...path]": {
       status: 301,
-      destination: "/pgn-archives/[path]"
+      destination: "/pgn-archives/[...path]"
     },
-    "/en/posts/[path]": {
+    "/en/posts/[...path]": {
       status: 301,
-      destination: "/pgn-archives/[path]"
+      destination: "/pgn-archives/[...path]"
     },
     "/contact/form": {
       status: 301,

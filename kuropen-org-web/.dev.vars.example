@@ -1,4 +1,4 @@
-# Use Cloudflare Turnstile test keys locally. Never enable remote email bindings for tests.
-TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
-TURNSTILE_SITE_KEY=1x00000000000000000000AA
-TURNSTILE_HOSTNAMES=localhost,127.0.0.1
+# Use hCaptcha test keys locally. Never enable remote email bindings for tests.
+HCAPTCHA_SECRET_KEY=0x0000000000000000000000000000000000000000
+HCAPTCHA_SITE_KEY=10000000-ffff-ffff-ffff-000000000001
+HCAPTCHA_HOSTNAMES=test.kuropen.org,dummy-key-pass

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
 import { Miniflare, kCurrentWorker, convertV4MiniflareOptions } from 'miniflare';
-import { validateInquiry, verifyTurnstile } from '../src/server/inquiry.ts';
+import { validateInquiry, verifyHCaptcha } from '../src/server/inquiry.ts';
 
 test('validates inquiry fields and rejects malformed input', () => {
     assert.equal(validateInquiry('123456', 'other', 'Hello'), null);
@@ -12,22 +12,38 @@ test('validates inquiry fields and rejects malformed input', () => {
     assert.ok(validateInquiry('123456', 'other', 'a'.repeat(10001)));
 });
 
-test('Turnstile checks success, action and hostname and fails closed', async () => {
+test('hCaptcha checks success and hostname and fails closed', async () => {
     const original = globalThis.fetch;
-    const env = { TURNSTILE_SECRET_KEY: 'test', TURNSTILE_HOSTNAMES: 'kuropen.org' };
+    const env = { HCAPTCHA_SECRET_KEY: 'test', HCAPTCHA_SITE_KEY: 'sitekey', HCAPTCHA_HOSTNAMES: 'kuropen.org' };
     const request = new Request('https://kuropen.org/inquiry');
     try {
         for (const [payload, expected] of [
-            [{ success: true, action: 'inquiry_code', hostname: 'kuropen.org' }, true],
-            [{ success: false, action: 'inquiry_code', hostname: 'kuropen.org' }, false],
-            [{ success: true, action: 'inquiry_submit', hostname: 'kuropen.org' }, false],
-            [{ success: true, action: 'inquiry_code', hostname: 'attacker.example' }, false],
+            [{ success: true, hostname: 'kuropen.org' }, true],
+            [null, false],
+            [{ success: true }, false],
+            [{ success: 'true', hostname: 'kuropen.org' }, false],
+            [{ success: false, hostname: 'kuropen.org' }, false],
+            [{ success: true, hostname: 'attacker.example' }, false],
         ]) {
-            globalThis.fetch = async () => Response.json(payload);
-            assert.equal(await verifyTurnstile(request, 'token', 'inquiry_code', env), expected);
+            globalThis.fetch = async (url, options) => {
+                assert.equal(url, 'https://api.hcaptcha.com/siteverify');
+                assert.equal(options.method, 'POST');
+                assert.equal(options.body.get('sitekey'), 'sitekey');
+                assert.equal(options.body.get('secret'), 'test');
+                assert.equal(options.body.get('response'), 'token');
+                return Response.json(payload);
+            };
+            assert.equal(await verifyHCaptcha(request, 'token', env), expected);
         }
-        assert.equal(await verifyTurnstile(request, '', 'inquiry_code', env), false);
-        assert.equal(await verifyTurnstile(request, 'token', 'inquiry_code', {}), false);
+        globalThis.fetch = async () => { throw new Error('network failure'); };
+        assert.equal(await verifyHCaptcha(request, 'token', env), false);
+        globalThis.fetch = async () => new Response('invalid JSON');
+        assert.equal(await verifyHCaptcha(request, 'token', env), false);
+        globalThis.fetch = async () => Response.json({ success: true, hostname: 'kuropen.org' }, { status: 503 });
+        assert.equal(await verifyHCaptcha(request, 'token', env), false);
+        assert.equal(await verifyHCaptcha(request, 'token', { ...env, HCAPTCHA_SITE_KEY: '' }), false);
+        assert.equal(await verifyHCaptcha(request, '', env), false);
+        assert.equal(await verifyHCaptcha(request, 'token', {}), false);
     } finally { globalThis.fetch = original; }
 });
 

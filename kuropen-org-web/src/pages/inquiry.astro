@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { env } from 'cloudflare:workers';
-import { categories, digest, validateInquiry, verifyTurnstile } from '../server/inquiry';
+import { categories, digest, validateInquiry, verifyHCaptcha } from '../server/inquiry';
 
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'private, no-store');
@@ -64,7 +64,7 @@ if (Astro.request.method === 'POST') {
                 if (!allowed) {
                     Astro.response.status = 429;
                     error = '送信回数の上限に達しました。しばらく待ってからお試しください。';
-                } else if (!await verifyTurnstile(Astro.request, field('cf-turnstile-response'), `inquiry_${action}`, env)) {
+                } else if (!await verifyHCaptcha(Astro.request, field('h-captcha-response'), env)) {
                     Astro.response.status = 403;
                     error = 'セキュリティ確認に失敗しました。フォームを開き直して、再度お試しください。';
                 } else if (action === 'code') {
@@ -94,7 +94,7 @@ if (Astro.request.method === 'POST') {
     }
 }
 const challenge = complete ? null : await coordinator.view();
-const configured = Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY);
+const configured = Boolean(env.HCAPTCHA_SITE_KEY && env.HCAPTCHA_SECRET_KEY);
 ---
 
 <Layout title="メールフォーム" breadcrumbs={[{ title: 'Contact', url: '/contact' }]}>
@@ -119,7 +119,7 @@ const configured = Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY);
                 <p>いたずら防止のため、最初にメールアドレスを確認します。入力したアドレスに6桁の確認コードをお送りします。</p>
                 <label for="email">返信先メールアドレス（必須）</label>
                 <input id="email" name="email" type="email" autocomplete="email" maxlength="254" value={email} required />
-                {configured && <div class="cf-turnstile" data-sitekey={env.TURNSTILE_SITE_KEY} data-action="inquiry_code" data-size="flexible" data-language="ja"></div>}
+                {configured && <div class="h-captcha" data-sitekey={env.HCAPTCHA_SITE_KEY}></div>}
                 <button type="submit" disabled={!configured}>確認コードを送信 →</button>
             </form> : <>
                 <form method="post" action="/inquiry" class="flex flex-col gap-4">
@@ -136,7 +136,7 @@ const configured = Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY);
                     <label for="body">お問い合わせ本文（必須）</label>
                     <textarea id="body" name="body" rows="8" maxlength="10000" required aria-describedby="body-help">{body}</textarea>
                     <p id="body-help" class="text-sm">10,000文字以内。パスワードなどの機密情報は入力しないでください。</p>
-                    {configured && <div class="cf-turnstile" data-sitekey={env.TURNSTILE_SITE_KEY} data-action="inquiry_submit" data-size="flexible" data-language="ja"></div>}
+                    {configured && <div class="h-captcha" data-sitekey={env.HCAPTCHA_SITE_KEY}></div>}
                     <button type="submit" disabled={!configured}>お問い合わせを送信 →</button>
                 </form>
                 <form method="post" action="/inquiry" class="flex flex-col gap-2">
@@ -149,7 +149,7 @@ const configured = Boolean(env.TURNSTILE_SITE_KEY && env.TURNSTILE_SECRET_KEY);
         </>}
     </section>
 </Layout>
-{!complete && configured && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+{!complete && configured && <script is:inline src="https://js.hcaptcha.com/1/api.js?hl=ja" async defer></script>}
 
 <style>
     @reference '../styles/global.css';

@@ -2,7 +2,7 @@
 
 declare namespace Cloudflare {
     interface Env {
-        TURNSTILE_SECRET_KEY: string;
+        HCAPTCHA_SECRET_KEY: string;
     }
 }
 

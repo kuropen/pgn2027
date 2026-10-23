@@ -13,17 +13,20 @@ Before deployment:
 
 - Enable Cloudflare Email Sending for `kuropen.org` and verify that the configured
   sender `inquiry@kuropen.org` can send transactional mail to public recipients.
-- Set `TURNSTILE_SITE_KEY` and `TURNSTILE_HOSTNAMES` in `wrangler.jsonc`, and store
-  `TURNSTILE_SECRET_KEY` as a Worker secret. Permit the production hostname in
-  the Turnstile widget. The form stays disabled until keys are configured.
+- Set `HCAPTCHA_SITE_KEY` and `HCAPTCHA_HOSTNAMES` in `wrangler.jsonc`, and store
+  `HCAPTCHA_SECRET_KEY` as a Worker secret. Permit the production hostname in
+  the hCaptcha widget. The form stays disabled until keys are configured.
 - KV is automatically provisioned on deployment; to use an existing namespace,
   add its `id` to the `INQUIRY_CODES` binding. Keep the Durable Object migration.
 - Category destinations are defined in `src/server/inquiry.ts`.
 
 For local development, copy `.dev.vars.example` to `.dev.vars` (preserve any
 existing values), then use `npm run dev -- --background`. The example contains
-Cloudflare's public Turnstile testing keys, for local use only. Email is simulated
-locally; do not enable remote bindings for test runs. Run `npm test`,
+hCaptcha's public testing keys, for local use only. Email is simulated
+locally; do not enable remote bindings for test runs. For hCaptcha browser testing,
+map `test.kuropen.org` to `127.0.0.1` in your hosts file and open the dev server
+through that hostname (hCaptcha does not support `localhost`). The local hostname
+allowlist also includes `dummy-key-pass`, returned by hCaptcha test credentials. Run `npm test`,
 `npm run generate-types`, and `npm run build` to validate changes.
 
 ```sh

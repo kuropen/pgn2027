@@ -4,7 +4,13 @@
 	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "kuropen-org-web",
 	"main": "./src/worker.ts",
-	"kv_namespaces": [{ "binding": "INQUIRY_CODES" }],
+	"routes": [{ "pattern": "kuropen.org", "custom_domain": true }],
+	"workers_dev": true,
+	"preview_urls": true,
+	"kv_namespaces": [
+		{ "binding": "SESSION", "id": "061ac954e63544a1b3111c456e463e01" },
+		{ "binding": "INQUIRY_CODES" }
+	],
 	"send_email": [{ "name": "EMAIL", "allowed_sender_addresses": ["inquiry@kuropen.org"] }],
 	"durable_objects": {
 		"bindings": [{ "name": "INQUIRY", "class_name": "InquiryCoordinator" }]
@@ -12,8 +18,8 @@
 	"migrations": [{ "tag": "inquiry-v1", "new_sqlite_classes": ["InquiryCoordinator"] }],
 	"vars": {
 		"INQUIRY_FROM": "inquiry@kuropen.org",
-		"TURNSTILE_SITE_KEY": "",
-		"TURNSTILE_HOSTNAMES": "kuropen.org"
+		"HCAPTCHA_SITE_KEY": "f72eb5fa-b3d6-4890-b80c-c2dcae34c06a",
+		"HCAPTCHA_HOSTNAMES": "kuropen.org"
 	},
 	"assets": {
 		"directory": "./dist",

@@ -1,7 +1,7 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from '../../layouts/Layout.astro';
 import { env } from 'cloudflare:workers';
-import { categories, digest, validateInquiry, verifyHCaptcha } from '../server/inquiry';
+import { categories, digest, validateInquiry, verifyHCaptcha } from '../../server/inquiry';
 
 export const prerender = false;
 Astro.response.headers.set('Cache-Control', 'private, no-store');
@@ -152,7 +152,7 @@ const configured = Boolean(env.HCAPTCHA_SITE_KEY && env.HCAPTCHA_SECRET_KEY);
 {!complete && configured && <script is:inline src="https://js.hcaptcha.com/1/api.js?hl=ja" async defer></script>}
 
 <style>
-    @reference '../styles/global.css';
+    @reference '../../styles/global.css';
     .inquiry input:not([type="hidden"]), .inquiry select, .inquiry textarea {
         @apply w-full min-w-0 p-3 border border-gray-500 rounded-xl bg-gray-50 dark:bg-gray-900;
     }

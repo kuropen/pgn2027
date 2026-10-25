@@ -9,6 +9,8 @@ This repository contains following projects:
 |kuropen-org-web|Main Website|Astro     |
 |pgn2027-inquiry|Inquiry Form|Laravel   |
 
+NOTE: Laravel-based form is no longer in use so the code is now removed. Technology note remains.
+
 ## License
 All rights reserved. Copyright (C) 2026 Kuropen (Hirochika Yuda).
 

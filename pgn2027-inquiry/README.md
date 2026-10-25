@@ -1,23 +1,16 @@
 # Kuropen.org inquiry
 
-## Notes
-
-This system is prototyped by OpenAI Codex, GPT-6.0 Astra.
-
 ## Overview
 
-This is a inquiry form, finally located at https://inquiry.kuropen.org/.
+This document describes a inquiry form, located at https://kuropen.org/inquiry/ .
 
 To avoid abuse of E-Mail address (both the site administrator and someone who discloses for public interest), this system verifies the user's address first sending one-time PIN.
-
-## Technology Stack
-- Laravel 13
-- Docker
-- Railway (for production environment)
 
 ## Request and email delivery flow
 
 The chart shows the production configuration: Laravel Octane with FrankenPHP, PostgreSQL for verification and encrypted outgoing mail, and Redis for sessions, rate limiting, and delivery jobs. An accepted inquiry is saved for delivery; it does not mean both emails have already been delivered.
+
+Note: After [the Railway Security Incident](https://blog.railway.com/p/preliminary-report-october-security-incident) on the same day as the PHP2Shell patch, the form has been migrated to the current URL using Astro + Cloudflare Workers technology stack. So the behavior may be slightly changed.
 
 ```mermaid
 flowchart TD

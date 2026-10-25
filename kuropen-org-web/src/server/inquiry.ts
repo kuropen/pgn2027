@@ -14,14 +14,20 @@ export function validateInquiry(code: string, category: string, body: string) {
     return null;
 }
 
-export async function verifyTurnstile(request: Request, token: string, action: string, env: Env) {
-    if (!token || token.length > 2048 || !env.TURNSTILE_SECRET_KEY) return false;
-    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-        method: 'POST',
-        body: new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: token, remoteip: request.headers.get('CF-Connecting-IP') || '' }),
-        signal: AbortSignal.timeout(10000),
-    });
-    const result = await response.json() as { success?: boolean; action?: string; hostname?: string };
-    return response.ok && result.success === true && result.action === action
-        && env.TURNSTILE_HOSTNAMES.split(',').map(host => host.trim()).includes(result.hostname || '');
+export async function verifyHCaptcha(request: Request, token: string, env: Env) {
+    if (!token || token.length > 16384 || !env.HCAPTCHA_SECRET_KEY?.trim()
+        || !env.HCAPTCHA_SITE_KEY?.trim() || !env.HCAPTCHA_HOSTNAMES?.trim()) return false;
+    try {
+        const response = await fetch('https://api.hcaptcha.com/siteverify', {
+            method: 'POST',
+            body: new URLSearchParams({ secret: env.HCAPTCHA_SECRET_KEY, sitekey: env.HCAPTCHA_SITE_KEY,
+                response: token, remoteip: request.headers.get('CF-Connecting-IP') || '' }),
+            signal: AbortSignal.timeout(10000),
+        });
+        const result = await response.json() as { success?: boolean; hostname?: string } | null;
+        return response.ok && result?.success === true
+            && env.HCAPTCHA_HOSTNAMES.split(',').map(host => host.trim()).includes(result.hostname || '');
+    } catch {
+        return false;
+    }
 }

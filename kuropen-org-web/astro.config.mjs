@@ -48,6 +48,12 @@ export default defineConfig({
     },
   },
 
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    imageService: {
+      build: 'compile',
+      runtime: 'passthrough',
+    },
+    sessionKVBindingName: 'SESSION',
+  }),
   integrations: [react(), sitemap()]
 });

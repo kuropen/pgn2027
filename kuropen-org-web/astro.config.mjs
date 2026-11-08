@@ -55,5 +55,10 @@ export default defineConfig({
     },
     sessionKVBindingName: 'SESSION',
   }),
-  integrations: [react(), sitemap()]
+  integrations: [
+    react(), 
+    sitemap({
+      filter: (page) => page !== 'https://kuropen.org/inquiry/'
+    }),
+  ]
 });

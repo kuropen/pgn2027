@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 
 const getRobotsTxt = (sitemapURL: URL) => `\
 User-agent: *
-Allow: /
+Disallow: /inquiry/
 
 User-agent: Baiduspider
 User-agent: Sogou

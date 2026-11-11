@@ -52,6 +52,9 @@ backTo:
 - ヘッドホン: Audio-Technica ATH-GL3
 - ゲームパッド: RAZER WOLVERINE V2
 
+この端末で [Folding@home に参加しています](https://stats.foldingathome.org/donor/391936600)。  
+ (運用時間: 11月から2月までの 23:00 から翌 8:00 まで。不在時・電力逼迫時を除く)
+
 #### モバイルノート
 
 - 機種名: ThinkBook 14 Gen 8

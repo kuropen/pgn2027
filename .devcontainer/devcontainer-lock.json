@@ -1,0 +1,19 @@
+{
+  "features": {
+    "ghcr.io/aqua/devcontainer-antigravity-cli/antigravity-cli:1": {
+      "version": "1.0.2",
+      "resolved": "ghcr.io/aqua/devcontainer-antigravity-cli/antigravity-cli@sha256:d7ae5139e62443070175cae13c275ae08efa8d89d6d5d432f96f3f9df51c2030",
+      "integrity": "sha256:d7ae5139e62443070175cae13c275ae08efa8d89d6d5d432f96f3f9df51c2030"
+    },
+    "ghcr.io/devcontainers-extra/features/cloudflare-wrangler:1": {
+      "version": "1.0.3",
+      "resolved": "ghcr.io/devcontainers-extra/features/cloudflare-wrangler@sha256:36f8ceba43b2503022e6eff4ad80ef4848d54c369d9bc966bf7063517b9a7eb5",
+      "integrity": "sha256:36f8ceba43b2503022e6eff4ad80ef4848d54c369d9bc966bf7063517b9a7eb5"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "1.1.3",
+      "resolved": "ghcr.io/devcontainers/features/github-cli@sha256:bd7ab48a832228f633239277552c30b353867fef2e5b037e064b4e64f0b843f2",
+      "integrity": "sha256:bd7ab48a832228f633239277552c30b353867fef2e5b037e064b4e64f0b843f2"
+    }
+  }
+}

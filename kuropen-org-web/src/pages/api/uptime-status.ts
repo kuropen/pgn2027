@@ -57,6 +57,7 @@ export const GET = (async () => {
     return new Response(JSON.stringify(await Promise.all(statusPagesCheckPromises)), {
         headers: {
             "content-type": "application/json",
+            "cache-control": "public, max-age=150, must-revalidate, stale-if-error=3600",
         }
     });
 }) satisfies APIRoute;

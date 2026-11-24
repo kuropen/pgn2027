@@ -38,9 +38,20 @@ const redirctedArchives = defineCollection({
     }),
 })
 
+const statusPages = defineCollection({
+    loader: file("src/data/status_pages.yaml"),
+    schema: z.object({
+        phare_pj_id: z.int(),
+        phare_sp_id: z.int(),
+        project_name: z.string(),
+        status_page: z.url(),
+    }),
+})
+
 export const collections = {
     links,
     banners,
     redirctedArchives,
     projects,
+    statusPages,
 }

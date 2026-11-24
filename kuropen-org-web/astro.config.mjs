@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
+import svgr from "vite-plugin-svgr";
 
 import tailwindcss from '@tailwindcss/vite';
 
@@ -14,7 +15,18 @@ export default defineConfig({
   site: 'https://kuropen.org',
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [
+      tailwindcss(),
+      svgr({
+        include: '**/*.svg?react',
+        svgrOptions: {
+          plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
+          svgoConfig: {
+            plugins: ['preset-default', 'removeTitle', 'removeDesc', 'removeDoctype', 'cleanupIds'],
+          },
+        },
+      }),
+    ]
   },
 
   fonts: [

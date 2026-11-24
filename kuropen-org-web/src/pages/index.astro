@@ -1,4 +1,5 @@
 ---
+import { Status } from '../components/concerns/Status';
 import Layout from '../layouts/Layout.astro';
 import Author from '../components/concerns/Author.astro';
 import BlogList from '../components/concerns/BlogList.astro';
@@ -8,6 +9,7 @@ import RightArrow from '../assets/icons/right.svg';
 ---
 
 <Layout title="Home" isHome={true}>
+	<Status client:only />
 	<Author />
 	<BlogList />
 	<ProjectList />

@@ -10,6 +10,8 @@ import react from "@astrojs/react";
 
 import sitemap from "@astrojs/sitemap";
 
+import mdx from "@astrojs/mdx";
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://kuropen.org',
@@ -67,10 +69,7 @@ export default defineConfig({
     },
     sessionKVBindingName: 'SESSION',
   }),
-  integrations: [
-    react(), 
-    sitemap({
-      filter: (page) => page !== 'https://kuropen.org/inquiry/'
-    }),
-  ]
+  integrations: [react(), sitemap({
+    filter: (page) => page !== 'https://kuropen.org/inquiry/'
+  }), mdx()]
 });

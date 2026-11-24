@@ -5,7 +5,14 @@ backTo:
     url: /
     title: トップページ
 ---
+import {Status} from "../../components/concerns/Status.tsx";
+
 # MICROPEN
+
+<div class="not-prose">
+<Status only="MICROPEN" client:only />
+</div>
+
 ![MICROPEN icon](./micropen.png)
 このページはKuropenの自営Misskeyサーバー・[MICROPEN](https://mi.kuropen.org/)の紹介です。2022年12月30日に開設しました。
 

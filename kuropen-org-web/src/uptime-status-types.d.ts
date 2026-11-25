@@ -6,22 +6,32 @@ export type UptimeStatusApiResponse = {
 }
 
 export type PhareIncidentImpact = 'unknown' | 'operational' | 'maintenance' | 'degraded_performance' | 'partial_outage' | 'major_outage'
+export type PhareMonitorComponent = {
+    component_type: 'uptime/monitor' | 'uptime/heartbeat';
+    component_id: number;
+    name: string;
+    response_time: number | null;
+    availability: number;
+    current_incident_impact: PhareIncidentImpact;
+}
+export type PhareGroupComponent = {
+    component_type: 'uptime/group';
+    name: string;
+    response_time: number | null;
+    availability: number;
+    current_incident_impact: PhareIncidentImpact;
+    components: PhareMonitorComponent[];
+}
 export type PhareCurrentStatusApiResponse = {
     current_incident_impact: PhareIncidentImpact;
     availability: number;
     updated_at: string;
-    components: {
-        component_type: 'uptime/monitor' | 'uptime/heartbeat';
-        component_id: number;
-        name: string;
-        response_time: number | null;
-        availability: number;
-        current_incident_impact: PhareIncidentImpact; 
-    }[];
+    components: (PhareMonitorComponent | PhareGroupComponent)[];
     active_incidents: {
         id: number;
         title: string;
         impact: PhareIncidentImpact;
+        state: 'unknown' | 'investigating' | 'identified' | 'monitoring' | 'resolved';
         status: 'ongoing' | 'recovering' | 'recovered';
         exclude_from_downtime: boolean;
         incident_at: string | null;
